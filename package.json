@@ -1,0 +1,51 @@
+{
+	"name": "tfmodblock-vscode-extension",
+	"displayName": "tfmodblock-vscode-extension",
+	"description": "Terraform module block snipetter",
+	"version": "0.0.1",
+	"engines": {
+		"vscode": "^1.67.0"
+	},
+	"categories": [
+		"Other"
+	],
+	"activationEvents": [
+		"onCommand:tfmodblock-vscode-extension.copyModuleBlockSnippet"
+	],
+	"main": "./extension.js",
+	"contributes": {
+		"commands": [
+			{
+				"command": "tfmodblock-vscode-extension.copyModuleBlockSnippet",
+				"title": "Copy Module Block Snippet",
+				"category": "tfmodblock"
+			}
+		],
+		"configuration": {
+			"title": "tfmodblock setting",
+			"properties": {
+				"tfmodblock.binPath": {
+					"type": "string",
+					"description": "Path to tfmodblock binary",
+					"default": "/usr/local/bin/tfmodblock"
+				}
+			}
+		}
+	},
+	"scripts": {
+		"lint": "eslint .",
+		"pretest": "npm run lint",
+		"test": "node ./test/runTest.js"
+	},
+	"devDependencies": {
+		"@types/vscode": "^1.67.0",
+		"@types/glob": "^7.2.0",
+		"@types/mocha": "^9.1.1",
+		"@types/node": "16.x",
+		"eslint": "^8.16.0",
+		"glob": "^8.0.3",
+		"mocha": "^10.0.0",
+		"typescript": "^4.7.2",
+		"@vscode/test-electron": "^2.1.3"
+	}
+}
