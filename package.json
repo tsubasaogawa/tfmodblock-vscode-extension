@@ -1,6 +1,6 @@
 {
-	"name": "tfmodblock-vscode-extension",
-	"displayName": "tfmodblock-vscode-extension",
+	"name": "tfmodblock",
+	"displayName": "tfmodblock",
 	"description": "Terraform module block snipetter",
 	"version": "0.0.1",
 	"engines": {
@@ -10,14 +10,20 @@
 		"Other"
 	],
 	"activationEvents": [
-		"onCommand:tfmodblock-vscode-extension.copyModuleBlockSnippet"
+		"onCommand:tfmodblock.copyModuleBlockSnippet",
+		"onCommand:tfmodblock.insertModuleBlockSnippet"
 	],
 	"main": "./extension.js",
 	"contributes": {
 		"commands": [
 			{
-				"command": "tfmodblock-vscode-extension.copyModuleBlockSnippet",
+				"command": "tfmodblock.copyModuleBlockSnippet",
 				"title": "Copy Module Block Snippet",
+				"category": "tfmodblock"
+			},
+			{
+				"command": "tfmodblock.insertModuleBlockSnippet",
+				"title": "Insert Module Block Snippet from Current Cursor",
 				"category": "tfmodblock"
 			}
 		],

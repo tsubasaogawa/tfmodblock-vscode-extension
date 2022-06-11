@@ -3,7 +3,8 @@
 const vscode = require('vscode');
 const path = require('path');
 const child_process = require('child_process');
-const { utimes } = require('fs');
+const fs = require('fs');
+const { exit } = require('process');
 const config = vscode.workspace.getConfiguration('tfmodblock');
 
 let outputChannel = vscode.window.createOutputChannel('tfmodblock');
@@ -15,37 +16,72 @@ let outputChannel = vscode.window.createOutputChannel('tfmodblock');
  * @param {vscode.ExtensionContext} context
  */
 function activate(context) {
-
-	// Use the console to output diagnostic information (console.log) and errors (console.error)
-	// This line of code will only be executed once when your extension is activated
-	console.log('Congratulations, your extension "tfmodblock-vscode-extension" is now active!');
-
 	// The command has been defined in the package.json file
 	// Now provide the implementation of the command with  registerCommand
 	// The commandId parameter must match the command field in package.json
-	let disposable = vscode.commands.registerCommand('tfmodblock-vscode-extension.copyModuleBlockSnippet', function () {
+	let disposables = [];
+	disposables.push(vscode.commands.registerCommand('tfmodblock.copyModuleBlockSnippet', function () {
 		// The code you place here will be executed every time your command is executed
 		let editor = vscode.window.activeTextEditor;
 		if (editor == null) {
 			throw new Error();
 		}
-		let currentFilePath = editor.document.fileName;
-		let currentDir = path.dirname(currentFilePath);
-		const binPath = config.binPath;
+		const currentFilePath = editor.document.fileName;
+		const currentDir = path.dirname(currentFilePath);
+		try {
+			let existsTfFile = false;
+			const currentDirFiles = fs.readdirSync(currentDir);
+			for (const file of currentDirFiles) {
+				if (file.endsWith('.tf')) {
+					existsTfFile = true;
+				}
+			}
+			if (!existsTfFile) {
+				throw new Error('There is no *.tf file');
+			}
+		} catch (e) {
+			vscode.window.showErrorMessage(e);
+			return;
+		}
 
 		// run tfmodblock
-		console.log(binPath);
-
-		child_process.exec(`${binPath} ${currentDir}`, (error, stdout, stderr) => {
-			outputChannel.appendLine(stdout);
+		child_process.exec(`${config.binPath} ${currentDir}`, async (error, stdout, stderr) => {
+			// outputChannel.appendLine(stdout);
+			await vscode.env.clipboard.writeText(stdout);
 			outputChannel.appendLine(stderr);
 		});
 
 		// Display a message box to the user
-		vscode.window.showInformationMessage(currentFilePath);
-	});
+		vscode.window.showInformationMessage("tfmodblock: copied");
+	}));
 
-	context.subscriptions.push(disposable);
+	disposables.push(vscode.commands.registerCommand('tfmodblock.insertModuleBlockSnippet', function () {
+		let editor = vscode.window.activeTextEditor;
+		if (editor == null) {
+			throw new Error();
+		}
+		// get module block from active cursor
+		const position = editor.selection.active;
+		const line = editor.document.lineAt(position.line);
+
+		const sourceMatch = line.text.match(/^\s*source\s*=\s*["]?([^"]+)["]?\s*$/)
+		if (sourceMatch == null) {
+			return;
+		}
+		const sourceRelPath = sourceMatch[1];
+		const currentPath = path.dirname(editor.document.fileName);
+		const pathToModule = path.resolve(`${currentPath}/${sourceRelPath}`);
+
+		child_process.exec(`${config.binPath} ${pathToModule}`, (error, stdout, stderr) => {
+			vscode.window.showInformationMessage(stdout);
+			outputChannel.appendLine(stderr);
+		});
+
+	}));
+
+	disposables.forEach(disposable => {
+		context.subscriptions.push(disposable);
+	});
 }
 
 // this method is called when your extension is deactivated
