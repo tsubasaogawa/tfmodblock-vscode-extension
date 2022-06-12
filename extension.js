@@ -4,14 +4,42 @@ const vscode = require('vscode');
 const path = require('path');
 const child_process = require('child_process');
 const fs = require('fs');
-const { exit } = require('process');
+const { format } = require('path');
 const config = vscode.workspace.getConfiguration('tfmodblock');
 
 let outputChannel = vscode.window.createOutputChannel('tfmodblock');
+let appendToOutput = function (msg) {
+	outputChannel.appendLine(`${msg}`);
+}
+
+const binaryMinimumVersion = '0.0.4';
+
+function isCompatible(currentVer) {
+	let m = {
+		minimum: binaryMinimumVersion.match(/(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)/),
+		current: `${currentVer}`.match(/(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)/),
+	};
+	if (m.minimum == null || m.current == null) {
+		vscode.window.showErrorMessage(`cannot parse version / minimum: ${m.minimum}, current: ${m.current}`);
+		return;
+	}
+	new Map([
+		['major', [m.minimum.groups.major, m.current.groups.minor]],
+		['minor', [m.minimum.groups.minor, m.current.groups.minor]],
+		['patch', [m.minimum.groups.patch, m.current.groups.patch]]
+	]).forEach(function (_, v) {
+		if (v[0] < v[1]) {
+			return true;
+		}
+		else if (v[0] > v[1]) {
+			return false;
+		}
+	});
+	return true;
+}
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
-
 /**
  * @param {vscode.ExtensionContext} context
  */
@@ -34,6 +62,7 @@ function activate(context) {
 			for (const file of currentDirFiles) {
 				if (file.endsWith('.tf')) {
 					existsTfFile = true;
+					break;
 				}
 			}
 			if (!existsTfFile) {
@@ -48,7 +77,7 @@ function activate(context) {
 		child_process.exec(`${config.binPath} ${currentDir}`, async (error, stdout, stderr) => {
 			// outputChannel.appendLine(stdout);
 			await vscode.env.clipboard.writeText(stdout);
-			outputChannel.appendLine(stderr);
+			appendToOutput(stderr);
 		});
 
 		// Display a message box to the user
@@ -64,24 +93,34 @@ function activate(context) {
 		const position = editor.selection.active;
 		const line = editor.document.lineAt(position.line);
 
-		const sourceMatch = line.text.match(/^\s*source\s*=\s*["]?([^"]+)["]?\s*$/)
+		const sourceMatch = line.text.match(/^\s*source\s*=\s*["]?(?<path>[^"]+)["]?\s*$/)
 		if (sourceMatch == null) {
 			return;
 		}
-		const sourceRelPath = sourceMatch[1];
+		const sourceRelPath = sourceMatch.groups.path;
 		const currentPath = path.dirname(editor.document.fileName);
 		const pathToModule = path.resolve(`${currentPath}/${sourceRelPath}`);
 
-		child_process.exec(`${config.binPath} ${pathToModule}`, (error, stdout, stderr) => {
-			vscode.window.showInformationMessage(stdout);
-			outputChannel.appendLine(stderr);
+		child_process.exec(`${config.binPath} --vscode ${pathToModule}`, (error, stdout, stderr) => {
+			const moduleSnippet = stdout;
+			appendToOutput(moduleSnippet);
+			editor.edit((edit => {
+				edit.insert(new vscode.Position(position.line + 1, 0), moduleSnippet);
+			}));
+			appendToOutput(stderr);
 		});
-
 	}));
 
 	disposables.forEach(disposable => {
 		context.subscriptions.push(disposable);
 	});
+
+	let binaryVersion = child_process.execSync(`${config.binPath} -v`);
+	appendToOutput(`Get ver: ${binaryVersion}`);
+	if (!isCompatible(binaryVersion)) {
+		vscode.window.showErrorMessage(`tfmodblock requires ${binaryMinimumVersion} at least (yours = ${binaryVersion})`);
+		return;
+	}
 }
 
 // this method is called when your extension is deactivated
