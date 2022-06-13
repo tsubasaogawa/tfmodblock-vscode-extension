@@ -4,7 +4,6 @@ const vscode = require('vscode');
 const path = require('path');
 const child_process = require('child_process');
 const fs = require('fs');
-const { format } = require('path');
 const config = vscode.workspace.getConfiguration('tfmodblock');
 
 let outputChannel = vscode.window.createOutputChannel('tfmodblock');

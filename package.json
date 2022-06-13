@@ -13,7 +13,7 @@
 		"onCommand:tfmodblock.copyModuleBlockSnippet",
 		"onCommand:tfmodblock.insertModuleBlockSnippet"
 	],
-	"main": "./extension.js",
+	"main": "./src/extension.js",
 	"contributes": {
 		"commands": [
 			{
