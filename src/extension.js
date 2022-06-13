@@ -10,19 +10,19 @@ const config = vscode.workspace.getConfiguration('tfmodblock');
  * @param {vscode.ExtensionContext} context
  */
 function activate(context) {
+	const binaryVersion = version.getBinaryVersion(config);
+	logger.output(`Current binary ver: ${binaryVersion}`);
+	if (!version.isCompatible(binaryVersion)) {
+		vscode.window.showErrorMessage(`tfmodblock requires ${version.getMinimumVersion()} at least (yours = ${binaryVersion})`);
+		return;
+	}
+
 	[
 		vscode.commands.registerCommand('tfmodblock.copyModuleBlockSnippet', tfmodblock.copyModuleBlockSnippet.bind(null, config)),
 		vscode.commands.registerCommand('tfmodblock.insertModuleBlockSnippet', tfmodblock.insertModuleBlockSnippet.bind(null, config)),
 	].forEach(disposable => {
 		context.subscriptions.push(disposable);
 	});
-
-	const binaryVersion = version.getBinaryVersion(config);
-	logger.output(`Get ver: ${binaryVersion}`);
-	if (!version.isCompatible(binaryVersion)) {
-		vscode.window.showErrorMessage(`tfmodblock requires ${version.getMinimumVersion()} at least (yours = ${binaryVersion})`);
-		return;
-	}
 }
 
 // this method is called when your extension is deactivated

@@ -11,6 +11,24 @@ module.exports = {
 
 /**
  * 
+ * @param {string} dir 
+ * @returns 
+ */
+function existsTfFile(dir) {
+    let existsTfFile = false;
+    const currentDirFiles = fs.readdirSync(dir);
+
+    for (const file of currentDirFiles) {
+        if (file.endsWith('.tf')) {
+            existsTfFile = true;
+            break;
+        }
+    }
+    return existsTfFile;
+}
+
+/**
+ * 
  * @param {vscode.WorkspaceConfiguration} config 
  * @returns void
  */
@@ -19,34 +37,22 @@ function copyModuleBlockSnippet(config) {
     if (editor == null) {
         throw new Error();
     }
+
     const currentFilePath = editor.document.fileName;
     const currentDir = path.dirname(currentFilePath);
-    try {
-        let existsTfFile = false;
-        const currentDirFiles = fs.readdirSync(currentDir);
-        for (const file of currentDirFiles) {
-            if (file.endsWith('.tf')) {
-                existsTfFile = true;
-                break;
-            }
-        }
-        if (!existsTfFile) {
-            throw new Error('There is no *.tf file');
-        }
-    } catch (e) {
-        vscode.window.showErrorMessage(e);
-        return;
+    if (!existsTfFile(currentDir)) {
+        throw new Error('There is no *.tf file');
     }
 
     // run tfmodblock
     child_process.exec(`${config.binPath} ${currentDir}`, async (error, stdout, stderr) => {
-        // outputChannel.appendLine(stdout);
         await vscode.env.clipboard.writeText(stdout);
-        logger.output(stderr);
+        if (stderr === '') {
+            logger.output(stderr);
+        } else {
+            vscode.window.showInformationMessage("tfmodblock: copied");
+        }
     });
-
-    // Display a message box to the user
-    vscode.window.showInformationMessage("tfmodblock: copied");
 }
 
 /**
@@ -63,8 +69,9 @@ function insertModuleBlockSnippet(config) {
     const position = editor.selection.active;
     const line = editor.document.lineAt(position.line);
 
-    const sourceMatch = line.text.match(/^\s*source\s*=\s*["]?(?<path>[^"]+)["]?\s*$/)
+    const sourceMatch = line.text.match(/^\s*source\s*=\s*["]?(?<path>[^"]+)["]?\s*$/);
     if (sourceMatch == null) {
+        vscode.window.showErrorMessage('tfmodblock: cannot parse source text');
         return;
     }
     const sourceRelPath = sourceMatch.groups.path;
@@ -73,11 +80,12 @@ function insertModuleBlockSnippet(config) {
 
     child_process.exec(`${config.binPath} --vscode ${pathToModule}`, (error, stdout, stderr) => {
         const moduleSnippet = stdout;
-        logger.output(moduleSnippet);
+        logger.output(`output: ${moduleSnippet}`);
         editor.edit((edit => {
             edit.insert(new vscode.Position(position.line + 1, 0), moduleSnippet);
         }));
-        logger.output(stderr);
+        if (stderr === '') {
+            logger.output(stderr);
+        }
     });
-
 }

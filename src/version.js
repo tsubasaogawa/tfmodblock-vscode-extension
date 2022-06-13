@@ -22,18 +22,17 @@ function isCompatible(currentVer) {
     if (m.minimum == null || m.current == null) {
         throw new Error(`cannot parse version / minimum: ${m.minimum}, current: ${m.current}`);
     }
-    new Map([
-        ['major', [m.minimum.groups.major, m.current.groups.minor]],
-        ['minor', [m.minimum.groups.minor, m.current.groups.minor]],
-        ['patch', [m.minimum.groups.patch, m.current.groups.patch]]
-    ]).forEach(function (_, v) {
-        if (v[0] < v[1]) {
-            return true;
+
+    for (const v in [
+        [m.minimum.groups.major, m.current.groups.minor],
+        [m.minimum.groups.minor, m.current.groups.minor],
+        [m.minimum.groups.patch, m.current.groups.patch]
+    ]) {
+        if (v[0] == v[1]) {
+            continue;
         }
-        else if (v[0] > v[1]) {
-            return false;
-        }
-    });
+        return v[0] < v[1];
+    }
     return true;
 }
 
