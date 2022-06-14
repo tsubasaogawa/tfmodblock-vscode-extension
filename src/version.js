@@ -17,14 +17,14 @@ module.exports = {
 function isCompatible(currentVer) {
     let m = {
         minimum: binaryMinimumVersion.match(/(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)/),
-        current: `${currentVer}`.match(/(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)/),
+        current: currentVer.match(/(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)/),
     };
     if (m.minimum == null || m.current == null) {
         throw new Error(`cannot parse version / minimum: ${m.minimum}, current: ${m.current}`);
     }
 
-    for (const v in [
-        [m.minimum.groups.major, m.current.groups.minor],
+    for (const v of [
+        [m.minimum.groups.major, m.current.groups.major],
         [m.minimum.groups.minor, m.current.groups.minor],
         [m.minimum.groups.patch, m.current.groups.patch]
     ]) {

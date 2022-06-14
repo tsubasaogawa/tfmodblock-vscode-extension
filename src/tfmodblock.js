@@ -47,7 +47,7 @@ function copyModuleBlockSnippet(config) {
     // run tfmodblock
     child_process.exec(`${config.binPath} ${currentDir}`, async (error, stdout, stderr) => {
         await vscode.env.clipboard.writeText(stdout);
-        if (stderr === '') {
+        if (stderr !== '') {
             logger.output(stderr);
         } else {
             vscode.window.showInformationMessage("tfmodblock: copied");
@@ -84,7 +84,7 @@ function insertModuleBlockSnippet(config) {
         editor.edit((edit => {
             edit.insert(new vscode.Position(position.line + 1, 0), moduleSnippet);
         }));
-        if (stderr === '') {
+        if (stderr !== '') {
             logger.output(stderr);
         }
     });
