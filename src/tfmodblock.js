@@ -79,7 +79,7 @@ function insertModuleBlockSnippet(config) {
     const pathToModule = path.resolve(`${currentPath}/${sourceRelPath}`);
 
     child_process.exec(`${config.binPath} --vscode ${pathToModule}`, (error, stdout, stderr) => {
-        const moduleSnippet = stdout;
+        const moduleSnippet = stdout.replace(/^\r?\n/g, '');
         logger.output(`output: ${moduleSnippet}`);
         editor.edit((edit => {
             edit.insert(new vscode.Position(position.line + 1, 0), moduleSnippet);
