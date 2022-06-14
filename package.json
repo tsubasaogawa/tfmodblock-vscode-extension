@@ -1,7 +1,7 @@
 {
 	"name": "tfmodblock",
 	"displayName": "tfmodblock",
-	"description": "Terraform module block snipetter",
+	"description": "Terraform module block snippeter",
 	"version": "0.0.1",
 	"engines": {
 		"vscode": "^1.67.0"
