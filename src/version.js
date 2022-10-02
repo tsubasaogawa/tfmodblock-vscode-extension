@@ -42,7 +42,7 @@ function isCompatible(currentVer) {
  * @returns string
  */
 function getBinaryVersion(config) {
-    return child_process.execSync(`${config.binPath} -v`).toString();
+    return child_process.execSync(`${config.binPath} -v`).toString().trim();
 }
 
 /**
