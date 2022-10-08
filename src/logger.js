@@ -2,7 +2,9 @@ const vscode = require('vscode');
 
 let outputChannel = vscode.window.createOutputChannel('tfmodblock');
 let output = function (msg) {
-    outputChannel.appendLine(`${getNow()} ${msg}`);
+    const outMsg = `${getNow()} ${msg}`;
+    outputChannel.appendLine(outMsg);
+    return outMsg;
 }
 
 function getNow() {

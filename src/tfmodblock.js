@@ -35,7 +35,7 @@ function existsTfFile(dir) {
 function copyModuleBlockSnippet(config) {
     let editor = vscode.window.activeTextEditor;
     if (editor == null) {
-        throw new Error();
+        throw new Error('Editor is null');
     }
 
     const currentFilePath = editor.document.fileName;
