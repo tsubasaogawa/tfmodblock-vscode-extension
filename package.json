@@ -8,8 +8,12 @@
 		"vscode": "^1.67.0"
 	},
 	"categories": [
-		"Other"
+		"Snippets"
 	],
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/tsubasaogawa/tfmodblock-vscode-extension.git"
+	},
 	"activationEvents": [
 		"onCommand:tfmodblock.copyModuleBlockSnippet",
 		"onCommand:tfmodblock.insertModuleBlockSnippet"
@@ -29,7 +33,7 @@
 			}
 		],
 		"configuration": {
-			"title": "tfmodblock setting",
+			"title": "tfmodblock",
 			"properties": {
 				"tfmodblock.binPath": {
 					"type": "string",
