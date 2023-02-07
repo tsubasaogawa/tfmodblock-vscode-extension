@@ -7,8 +7,18 @@ module.exports = {
     insertModuleBlockSnippet,
 }
 
+async function selectModuleDirectory() {
+    const dir = await vscode.window.showOpenDialog({
+        title: 'Choose module directory',
+        canSelectFiles: false,
+        canSelectFolders: true,
+        canSelectMany: false,
+    });
 
+    if (!dir || dir.length != 1) {
+        return '';
     }
+    return dir[0].path;
 }
 
 /**
@@ -16,12 +26,7 @@ module.exports = {
  * @param {vscode.WorkspaceConfiguration} config 
  * @returns void
  */
-/**
- * 
- * @param {vscode.WorkspaceConfiguration} config 
- * @returns void
- */
-function insertModuleBlockSnippet(config) {
+async function insertModuleBlockSnippet(config) {
     let editor = vscode.window.activeTextEditor;
     if (editor == null) {
         throw new Error('Editor is null');
@@ -31,14 +36,18 @@ function insertModuleBlockSnippet(config) {
     const line = editor.document.lineAt(position.line);
 
     const sourceMatch = line.text.match(/^\s*source\s*=\s*["]?(?<path>[^"]+)["]?\s*$/);
-    if (sourceMatch == null) {
-        vscode.window.showErrorMessage('tfmodblock: cannot parse source text');
-        return;
+    let pathToModule;
+    if (sourceMatch != null) {
+        const sourceRelPath = sourceMatch.groups.path;
+        const currentPath = path.dirname(editor.document.fileName);
+        pathToModule = path.resolve(`${currentPath}/${sourceRelPath}`);
+    } else {
+        pathToModule = await selectModuleDirectory();
+        // TODO: add `source` line
+        if (!pathToModule) {
+            return;
+        }
     }
-    const sourceRelPath = sourceMatch.groups.path;
-    const currentPath = path.dirname(editor.document.fileName);
-    const pathToModule = path.resolve(`${currentPath}/${sourceRelPath}`);
-
     child_process.exec(`${config.binPath} --vscode ${pathToModule}`, (error, stdout, stderr) => {
         const moduleSnippet = stdout.replace(/^\r?\n/g, '');
         logger.output(`output: ${moduleSnippet}`);
