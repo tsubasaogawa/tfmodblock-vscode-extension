@@ -16,17 +16,11 @@
 		"url": "https://github.com/tsubasaogawa/tfmodblock-vscode-extension.git"
 	},
 	"activationEvents": [
-		"onCommand:tfmodblock.copyModuleBlockSnippet",
 		"onCommand:tfmodblock.insertModuleBlockSnippet"
 	],
 	"main": "./src/extension.js",
 	"contributes": {
 		"commands": [
-			{
-				"command": "tfmodblock.copyModuleBlockSnippet",
-				"title": "Copy Module Block Snippet",
-				"category": "tfmodblock"
-			},
 			{
 				"command": "tfmodblock.insertModuleBlockSnippet",
 				"title": "Insert Module Block Snippet from Current Cursor",

@@ -18,7 +18,6 @@ function activate(context) {
 	}
 
 	[
-		vscode.commands.registerCommand('tfmodblock.copyModuleBlockSnippet', tfmodblock.copyModuleBlockSnippet.bind(null, config)),
 		vscode.commands.registerCommand('tfmodblock.insertModuleBlockSnippet', tfmodblock.insertModuleBlockSnippet.bind(null, config)),
 	].forEach(disposable => {
 		context.subscriptions.push(disposable);

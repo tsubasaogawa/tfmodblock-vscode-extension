@@ -1,30 +1,14 @@
 const vscode = require('vscode');
 const path = require('path');
-const fs = require('fs');
 const child_process = require('child_process');
 const logger = require('./logger');
 
 module.exports = {
-    copyModuleBlockSnippet,
     insertModuleBlockSnippet,
 }
 
-/**
- * 
- * @param {string} dir 
- * @returns 
- */
-function existsTfFile(dir) {
-    let existsTfFile = false;
-    const currentDirFiles = fs.readdirSync(dir);
 
-    for (const file of currentDirFiles) {
-        if (file.endsWith('.tf')) {
-            existsTfFile = true;
-            break;
-        }
     }
-    return existsTfFile;
 }
 
 /**
@@ -32,29 +16,6 @@ function existsTfFile(dir) {
  * @param {vscode.WorkspaceConfiguration} config 
  * @returns void
  */
-function copyModuleBlockSnippet(config) {
-    let editor = vscode.window.activeTextEditor;
-    if (editor == null) {
-        throw new Error('Editor is null');
-    }
-
-    const currentFilePath = editor.document.fileName;
-    const currentDir = path.dirname(currentFilePath);
-    if (!existsTfFile(currentDir)) {
-        throw new Error('There is no *.tf file');
-    }
-
-    // run tfmodblock
-    child_process.exec(`${config.binPath} ${currentDir}`, async (error, stdout, stderr) => {
-        await vscode.env.clipboard.writeText(stdout);
-        if (stderr !== '') {
-            logger.output(stderr);
-        } else {
-            vscode.window.showInformationMessage("tfmodblock: copied");
-        }
-    });
-}
-
 /**
  * 
  * @param {vscode.WorkspaceConfiguration} config 
