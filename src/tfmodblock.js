@@ -7,6 +7,10 @@ module.exports = {
     insertModuleBlockSnippet,
 }
 
+/**
+ * 
+ * @returns string
+ */
 async function selectModuleDirectory() {
     const dir = await vscode.window.showOpenDialog({
         title: 'Choose module directory',
@@ -23,6 +27,25 @@ async function selectModuleDirectory() {
 
 /**
  * 
+ * @param {vscode.TextEditor} editor 
+ * @param {vscode.Position} position 
+ * @returns string
+ */
+async function getModulePath(editor, position) {
+    const line = editor.document.lineAt(position.line);
+
+    const sourceMatch = line.text.match(/^\s*source\s*=\s*["]?(?<path>[^"]+)["]?\s*$/);
+    if (sourceMatch == null) {
+        return await selectModuleDirectory();
+    }
+
+    const sourceRelPath = sourceMatch.groups.path;
+    const currentPath = path.dirname(editor.document.fileName);
+    return path.resolve(`${currentPath}/${sourceRelPath}`);
+}
+
+/**
+ * 
  * @param {vscode.WorkspaceConfiguration} config 
  * @returns void
  */
@@ -31,24 +54,14 @@ async function insertModuleBlockSnippet(config) {
     if (editor == null) {
         throw new Error('Editor is null');
     }
-    // get module block from active cursor
-    const position = editor.selection.active;
-    const line = editor.document.lineAt(position.line);
 
-    const sourceMatch = line.text.match(/^\s*source\s*=\s*["]?(?<path>[^"]+)["]?\s*$/);
-    let pathToModule;
-    if (sourceMatch != null) {
-        const sourceRelPath = sourceMatch.groups.path;
-        const currentPath = path.dirname(editor.document.fileName);
-        pathToModule = path.resolve(`${currentPath}/${sourceRelPath}`);
-    } else {
-        pathToModule = await selectModuleDirectory();
-        // TODO: add `source` line
-        if (!pathToModule) {
-            return;
-        }
+    const position = editor.selection.active;
+    const modulePath = await getModulePath(editor, position);
+    if (!modulePath) {
+        return;
     }
-    child_process.exec(`${config.binPath} --vscode ${pathToModule}`, (error, stdout, stderr) => {
+
+    child_process.exec(`${config.binPath} --vscode ${modulePath}`, (error, stdout, stderr) => {
         const moduleSnippet = stdout.replace(/^\r?\n/g, '');
         logger.output(`output: ${moduleSnippet}`);
         editor.edit((edit => {
