@@ -6,6 +6,7 @@ suite('Extension Test: version', () => {
 	vscode.window.showInformationMessage('Start version tests.');
 
 	test('isCompatible returns true', () => {
+		assert.strictEqual(version.isCompatible('0.0.10'), true);
 		assert.strictEqual(version.isCompatible('999.99.99'), true);
 	});
 

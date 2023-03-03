@@ -31,7 +31,7 @@ function isCompatible(currentVer) {
         if (v[0] == v[1]) {
             continue;
         }
-        return v[0] < v[1];
+        return parseInt(v[0]) < parseInt(v[1]);
     }
     return true;
 }
