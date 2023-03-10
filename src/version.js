@@ -1,22 +1,27 @@
-const vscode = require('vscode');
+const vscode = require('vscode'); // eslint-disable-line
 const child_process = require('child_process');
 
 const binaryMinimumVersion = '0.0.4';
+const sortableVersion = '0.0.9';
+const useDefaultVersion = '0.0.13';
 
 module.exports = {
     isCompatible,
     getBinaryVersion,
-    getMinimumVersion,
+    binaryMinimumVersion,
+    sortableVersion,
+    useDefaultVersion,
 };
 
 /**
  * 
  * @param {string} currentVer 
+ * @param {string} minimumVer
  * @returns bool
  */
-function isCompatible(currentVer) {
+function isCompatible(currentVer, minimumVer = binaryMinimumVersion) {
     let m = {
-        minimum: binaryMinimumVersion.match(/(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)/),
+        minimum: minimumVer.match(/(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)/),
         current: currentVer.match(/(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)/),
     };
     if (m.minimum == null || m.current == null) {
@@ -43,11 +48,4 @@ function isCompatible(currentVer) {
  */
 function getBinaryVersion(config) {
     return child_process.execSync(`${config.binPath} -v`).toString().trim();
-}
-
-/**
- * @returns string
- */
-function getMinimumVersion() {
-    return binaryMinimumVersion;
 }

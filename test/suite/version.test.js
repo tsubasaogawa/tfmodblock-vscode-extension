@@ -7,6 +7,7 @@ suite('Extension Test: version', () => {
 
 	test('isCompatible returns true', () => {
 		assert.strictEqual(version.isCompatible('0.0.10'), true);
+		assert.strictEqual(version.isCompatible('0.0.4'), true);
 		assert.strictEqual(version.isCompatible('999.99.99'), true);
 	});
 
@@ -17,16 +18,5 @@ suite('Extension Test: version', () => {
 	test('isCompatible throws Error', () => {
 		assert.throws(() => { version.isCompatible('foobar'); }, Error);
 		assert.throws(() => { version.isCompatible(null); }, Error);
-	});
-
-	/* TODO: fix error 
-	test('getBinaryVersion calls a command with `-v` option', async () => {
-		let config = vscode.workspace.getConfiguration('tfmodblock');
-		await config.update('binPath', 'echo', true);
-		assert.match(version.getBinaryVersion(config), /^-v$/);
-	});
-	*/
-	test('getMimimumVersion returns some version string', () => {
-		assert.match(version.getMinimumVersion(), /^\d+\.\d+\.\d+$/);
 	});
 });

@@ -13,12 +13,12 @@ function activate(context) {
 	const binaryVersion = version.getBinaryVersion(config);
 	logger.output(`Current binary ver: ${binaryVersion}`);
 	if (!version.isCompatible(binaryVersion)) {
-		vscode.window.showErrorMessage(`tfmodblock requires ${version.getMinimumVersion()} at least (yours = ${binaryVersion})`);
+		vscode.window.showErrorMessage(`tfmodblock requires ${version.binaryMinimumVersion} at least (yours = ${binaryVersion})`);
 		return;
 	}
 
 	[
-		vscode.commands.registerCommand('tfmodblock.insertModuleBlockSnippet', tfmodblock.insertModuleBlockSnippet.bind(null, config)),
+		vscode.commands.registerCommand('tfmodblock.insertModuleBlockSnippet', tfmodblock.insertModuleBlockSnippet.bind(null, binaryVersion)),
 	].forEach(disposable => {
 		context.subscriptions.push(disposable);
 	});
