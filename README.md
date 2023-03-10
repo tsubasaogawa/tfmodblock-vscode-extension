@@ -2,7 +2,7 @@
 
 Terraform module block snippeter.
 
-![Demo](https://user-images.githubusercontent.com/7788821/173629183-e82c433a-6030-4434-a8f7-5979e35a394b.gif)
+![Demo](https://user-images.githubusercontent.com/7788821/224325538-a212e5fa-9138-4539-863d-4ed39bd446ed.gif)
 
 # Usage
 
@@ -15,9 +15,11 @@ Terraform module block snippeter.
 
 # Settings
 
-| Key                | Description               | Default                   |
-| ------------------ | ------------------------- | ------------------------- |
-| tfmodblock.binPath | Path to tfmodblock binary | /usr/local/bin/tfmodblock |
+| Key                   | Description                                                   | Default                   |
+| --------------------- | ------------------------------------------------------------- | ------------------------- |
+| tfmodblock.binPath    | Path to tfmodblock binary                                     | /usr/local/bin/tfmodblock |
+| tfmodblock.sort       | Sort the result (tfmodblock v0.0.9+)                          | true                      |
+| tfmodblock.useDefault | Use default value in the variable block (tfmodblock v0.0.13+) | true                      |
 
 # Limitation
 
