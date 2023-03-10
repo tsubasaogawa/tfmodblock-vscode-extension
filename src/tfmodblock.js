@@ -2,6 +2,7 @@ const vscode = require('vscode');
 const path = require('path');
 const child_process = require('child_process');
 const logger = require('./logger');
+const version = require('./version');
 
 module.exports = {
     insertModuleBlockSnippet,
@@ -38,7 +39,6 @@ async function getModulePath(editor, position) {
     if (sourceMatch == null) {
         return await selectModuleDirectory();
     }
-
     const sourceRelPath = sourceMatch.groups.path;
     const currentPath = path.dirname(editor.document.fileName);
     return path.resolve(`${currentPath}/${sourceRelPath}`);
@@ -46,10 +46,24 @@ async function getModulePath(editor, position) {
 
 /**
  * 
- * @param {vscode.WorkspaceConfiguration} config 
+ * @param {vscode.TextLine} line 
+ * @returns number
+ */
+function getIndentSpaceCount(line) {
+    const match = line.text.match(/^(?<indent>\s*)/);
+    if (match == null) {
+        return 0;
+    }
+    return match.groups.indent.length;
+}
+
+/**
+ * 
+ * @param {string} currentVer
  * @returns void
  */
-async function insertModuleBlockSnippet(config) {
+async function insertModuleBlockSnippet(currentVer) {
+    const config = vscode.workspace.getConfiguration('tfmodblock');
     let editor = vscode.window.activeTextEditor;
     if (editor == null) {
         throw new Error('Editor is null');
@@ -60,8 +74,13 @@ async function insertModuleBlockSnippet(config) {
     if (!modulePath) {
         return;
     }
+    const canSort = config.sort && version.isCompatible(currentVer, version.sortableVersion);
+    const canUseDefault = config.useDefault && version.isCompatible(currentVer, version.useDefaultVersion);
+    const indentSpaceCnt = getIndentSpaceCount(editor.document.lineAt(position.line));
+    const options = `--sort=${canSort} --default=${canUseDefault} --tabsize=${indentSpaceCnt} --vscode`
+    console.log(`${config.useDefault}`);
 
-    child_process.exec(`${config.binPath} --vscode ${modulePath}`, (error, stdout, stderr) => {
+    child_process.exec(`${config.binPath} ${options} ${modulePath}`, (error, stdout, stderr) => {
         const moduleSnippet = stdout.replace(/^\r?\n/g, '');
         logger.output(`output: ${moduleSnippet}`);
         editor.edit((edit => {
