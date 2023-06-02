@@ -11,7 +11,7 @@ const config = vscode.workspace.getConfiguration('tfmodblock');
  */
 function activate(context) {
 	const binaryVersion = version.getBinaryVersion(config);
-	logger.output(`Current binary ver: ${binaryVersion}`);
+	logger.output(`Extension ver: ${version.extensionVersion} / Binary ver: ${binaryVersion}`);
 	if (!version.isCompatible(binaryVersion)) {
 		vscode.window.showErrorMessage(`tfmodblock requires ${version.binaryMinimumVersion} at least (yours = ${binaryVersion})`);
 		return;
