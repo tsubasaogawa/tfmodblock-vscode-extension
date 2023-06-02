@@ -4,6 +4,7 @@ const child_process = require('child_process');
 const binaryMinimumVersion = '0.0.4';
 const sortableVersion = '0.0.9';
 const useDefaultVersion = '0.0.13';
+const extensionVersion = '0.0.6';
 
 module.exports = {
     isCompatible,
@@ -11,6 +12,7 @@ module.exports = {
     binaryMinimumVersion,
     sortableVersion,
     useDefaultVersion,
+    extensionVersion,
 };
 
 /**
