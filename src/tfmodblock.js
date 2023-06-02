@@ -80,7 +80,7 @@ async function insertModuleBlockSnippet(currentVer) {
     const options = `--sort=${canSort} --default=${canUseDefault} --tabsize=${indentSpaceCnt} --vscode`
     console.log(`${config.useDefault}`);
 
-    child_process.exec(`${config.binPath} ${options} ${modulePath}`, (error, stdout, stderr) => {
+    child_process.exec(`'${config.binPath}' ${options} '${modulePath}'`, (error, stdout, stderr) => {
         const moduleSnippet = stdout.replace(/^\r?\n/g, '');
         logger.output(`output: ${moduleSnippet}`);
         editor.edit((edit => {
