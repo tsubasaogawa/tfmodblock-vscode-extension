@@ -2,7 +2,7 @@
 	"name": "tfmodblock",
 	"displayName": "tfmodblock",
 	"description": "Terraform module block snippeter",
-	"version": "0.0.6",
+	"version": "0.0.7",
 	"publisher": "tsubasaogawa",
 	"icon": "assets/icon.jpg",
 	"engines": {
