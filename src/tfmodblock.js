@@ -76,18 +76,20 @@ async function insertModuleBlockSnippet(currentVer) {
     }
     const canSort = config.sort && version.isCompatible(currentVer, version.sortableVersion);
     const canUseDefault = config.useDefault && version.isCompatible(currentVer, version.useDefaultVersion);
+    const canUseDescription = config.useDescription && version.isCompatible(currentVer, version.useDescriptionVersion);
     const indentSpaceCnt = getIndentSpaceCount(editor.document.lineAt(position.line));
-    const options = `--sort=${canSort} --default=${canUseDefault} --tabsize=${indentSpaceCnt} --vscode`
+    const options = `--sort=${canSort} --default=${canUseDefault} --description=${canUseDescription} --tabsize=${indentSpaceCnt} --vscode`
     console.log(`${config.useDefault}`);
 
     child_process.exec(`'${config.binPath}' ${options} '${modulePath}'`, (error, stdout, stderr) => {
+        if (stderr !== '') {
+            vscode.window.showErrorMessage(stderr);
+            return;
+        }
         const moduleSnippet = stdout.replace(/^\r?\n/g, '');
-        logger.output(`output: ${moduleSnippet}`);
+        logger.output(`output: \n${moduleSnippet}`);
         editor.edit((edit => {
             edit.insert(new vscode.Position(position.line + 1, 0), moduleSnippet);
         }));
-        if (stderr !== '') {
-            logger.output(stderr);
-        }
     });
 }
