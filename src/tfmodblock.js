@@ -82,13 +82,14 @@ async function insertModuleBlockSnippet(currentVer) {
     console.log(`${config.useDefault}`);
 
     child_process.exec(`'${config.binPath}' ${options} '${modulePath}'`, (error, stdout, stderr) => {
+        if (stderr !== '') {
+            vscode.window.showErrorMessage(stderr);
+            return;
+        }
         const moduleSnippet = stdout.replace(/^\r?\n/g, '');
-        logger.output(`output: ${moduleSnippet}`);
+        logger.output(`output: \n${moduleSnippet}`);
         editor.edit((edit => {
             edit.insert(new vscode.Position(position.line + 1, 0), moduleSnippet);
         }));
-        if (stderr !== '') {
-            logger.output(stderr);
-        }
     });
 }
