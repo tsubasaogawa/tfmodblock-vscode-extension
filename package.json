@@ -44,6 +44,11 @@
 					"type": "boolean",
 					"description": "Use default value in the variable block (tfmodblock v0.0.13+)",
 					"default": true
+				},
+				"tfmodblock.useDescription": {
+					"type": "boolean",
+					"description": "Insert comment based on a variable description (tfmodblock v0.0.16+)",
+					"default": true
 				}
 			}
 		}
